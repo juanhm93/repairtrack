@@ -4,15 +4,16 @@ Los specs de este directorio traducen el [PRD](../prds/repairtrack-prd.md) en fe
 
 ## Recorte de esta iteración
 
-La primera entrega corre en un subdominio, **por usuario**, no por negocio:
+La primera entrega corre en un subdominio, **por persona**: una cuenta = un técnico.
 
-- Tickets, clientes e historial pertenecen al `User` autenticado
-- Correos y vista pública usan la marca de la app (`config('app.name')` + `mail.from`), no logo/colores por taller
-- No hay tabla `businesses`, ni `business_id`, ni settings de marca
+- Tickets, clientes, precios e historial pertenecen al `User` autenticado
+- Un técnico no ve datos de otro, aunque compartan el mismo local
+- Correos y vista pública usan la marca de la app (`config('app.name')` + `mail.from`), no logo/colores del técnico
+- No hay tabla `brands`, ni `brand_id`, ni settings de marca
 
-El cobro manual (PRD §6.6) es el [spec 06](06-manual-billing.md): se implementa **después de 01–04**, antes del branding. En el subdominio hay que poder cobrar; la marca del taller puede esperar.
+El cobro manual (PRD §6.6) es el [spec 06](06-manual-billing.md): se implementa **después de 01–04**, antes del branding. En el subdominio hay que poder cobrar; la marca personal puede esperar.
 
-El branding por negocio (PRD §6.1) queda en el [spec 05](05-business-branding.md) como **siguiente iteración**. Ese spec es aditivo: no cambia la dueñez de los tickets.
+La marca personal (PRD §6.1) queda en el [spec 05](05-personal-branding.md) como **siguiente iteración**. Ese spec es aditivo: no cambia la dueñez de los tickets ni crea un “taller compartido”.
 
 ## Criterio de recorte
 
@@ -35,17 +36,17 @@ Si al terminar el spec el frontend (o el siguiente spec) no puede usar el result
                    ↘  04-dashboard
                    ↘  06-manual-billing
 
-05-business-branding   ← siguiente iteración, no bloquea el MVP en subdominio
+05-personal-branding   ← siguiente iteración, no bloquea el MVP en subdominio
 ```
 
 | Spec | Idea | Depende de | Iteración |
 |------|------|------------|-----------|
 | [01-repair-tickets](01-repair-tickets.md) | PRD §6.2 Gestión de tickets | Auth Fortify | Ahora |
-| [02-email-notifications](02-email-notifications.md) | PRD §6.3 Correos (sin marca por taller) | 01 | Ahora |
+| [02-email-notifications](02-email-notifications.md) | PRD §6.3 Correos (sin marca personal) | 01 | Ahora |
 | [03-public-status](03-public-status.md) | PRD §6.4 Vista pública | 01 (02 para el link del correo) | Ahora |
 | [04-dashboard](04-dashboard.md) | PRD §6.5 Dashboard | 01 | Ahora |
 | [06-manual-billing](06-manual-billing.md) | PRD §6.6 Cobro manual PayPal/Binance | Auth + 01/04 (middleware) | Ahora (después de 01–04) |
-| [05-business-branding](05-business-branding.md) | PRD §6.1 Marca por negocio | 01–04 | Después |
+| [05-personal-branding](05-personal-branding.md) | PRD §6.1 Marca personal | 01–04 | Después |
 
 No se implementan en paralelo features que dependan de un spec anterior incompleto.
 
@@ -79,9 +80,9 @@ Heredadas por los specs 01–04 y 06:
 
 ## Fuera de alcance de esta iteración
 
-- Branding por negocio (logo, colores, remitente) — spec 05
-- Múltiples técnicos por negocio con cola propia (PRD §8)
+- Marca personal (logo, colores, remitente) — spec 05
+- Cuentas compartidas de un local o visibilidad cruzada entre técnicos (PRD §8)
 - SMS / WhatsApp
-- Pasarela automática (Stripe) o cobros del taller a su cliente
-- Dominio propio por negocio
+- Pasarela automática (Stripe) o cobros del técnico a su cliente
+- Dominio propio por usuario
 - Historial de reparaciones por cliente como vista dedicada

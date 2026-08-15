@@ -24,9 +24,9 @@ Reemplaza el placeholder de [`resources/js/pages/Dashboard.vue`](../../resources
 
 ## Fuera de alcance
 
-- Branding / nombre del taller en el dashboard (spec 05)
+- Branding / nombre del técnico en el dashboard (spec 05)
 - Gráficas, KPIs de ingresos o métricas de v2
-- Cola por técnico (PRD §8)
+- Cola compartida de un local o asignación entre técnicos (PRD §8)
 - Historial dedicado por cliente (PRD §8)
 - Bulk actions (cambiar estado a varios tickets)
 - Paginación infinita / live updates; paginación offset estándar sí entra

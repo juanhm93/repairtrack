@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Cerrar el PRD §6.4 **sin marca por taller**: el cliente final abre un link único (sin login) y ve el estado de su equipo y el timeline. No ve datos de otros clientes ni información del usuario dueño del ticket.
+Cerrar el PRD §6.4 **sin marca personal**: el cliente final abre un link único (sin login) y ve el estado de su equipo y el timeline. No ve datos de otros clientes ni información del usuario dueño del ticket.
 
-La página se presenta como RepairTrack (nombre de la app). Logo/colores del taller son el spec 05.
+La página se presenta como RepairTrack (nombre de la app). Logo/colores del técnico son el spec 05.
 
 ## Dependencias
 
@@ -22,7 +22,7 @@ La página se presenta como RepairTrack (nombre de la app). Logo/colores del tal
 
 ## Fuera de alcance
 
-- Branding por negocio (logo, colores, nombre del taller) — spec 05
+- Marca personal (logo, colores, nombre del técnico) — spec 05
 - Login o cuenta para el cliente (PRD §4)
 - Aprobar costo / responder desde la página pública (`waiting_approval` es solo informativo)
 - Buscador público por teléfono/email
@@ -72,7 +72,7 @@ Excluir explícitamente:
 - `estimated_cost`
 - `customer.email`, `customer.phone`
 - `customer.id`, `ticket.id`, `user_id`
-- `changed_by` (nombre del usuario del taller)
+- `changed_by` (nombre del técnico)
 - Email o nombre del dueño del ticket
 - Cualquier otro ticket o cliente
 
@@ -113,7 +113,7 @@ Página standalone:
 
 No hay formularios. Un link discreto a la home es opcional.
 
-Estilos: tokens de [`resources/css/tokens.css`](../../resources/css/tokens.css) y componentes UI (badge, etc.) sin el sidebar. No CSS variables de un taller.
+Estilos: tokens de [`resources/css/tokens.css`](../../resources/css/tokens.css) y componentes UI (badge, etc.) sin el sidebar. No CSS variables de marca personal.
 
 ### Tipos TS
 
@@ -138,7 +138,7 @@ Sin seeder nuevo. Los tickets de demo del spec 01 ya tienen `public_token`. `/t/
 ## Criterios de aceptación
 
 - Un cliente sin cuenta abre `/t/{token}` y entiende el estado de su equipo
-- Ve el nombre de RepairTrack y el timeline; no ve marca de un taller
+- Ve el nombre de RepairTrack y el timeline; no ve marca del técnico
 - No ve costo, contactos, dueño del ticket ni otros tickets
 - Token inválido = 404
 - El CTA del correo del spec 02 aterriza en esta página

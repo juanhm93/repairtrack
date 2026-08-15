@@ -6,7 +6,7 @@ Cerrar el PRD §6.2: el usuario registra un equipo, lo mueve de estado con una n
 
 Al terminar, create/show/cambio de estado están usables en el frontend. El listado filtrable es el spec 04.
 
-Todo es **por usuario**: un ticket y un cliente pertenecen al `User` que los creó. No hay `Business`.
+Todo es **por persona**: un ticket y un cliente pertenecen al `User` que los creó. No hay `Brand` ni cuenta de taller.
 
 ## Dependencias
 
@@ -29,9 +29,9 @@ Todo es **por usuario**: un ticket y un cliente pertenecen al `User` que los cre
 - Envío de correo al crear o cambiar estado (spec 02)
 - Ruta pública `/t/{token}` (spec 03); este spec sí genera y persiste `public_token`
 - Dashboard con filtros y atrasados (spec 04)
-- Tabla `businesses`, `business_id`, settings de marca (spec 05)
+- Tabla `brands`, `brand_id`, settings de marca (spec 05)
 - Vista dedicada de historial por cliente (PRD §8)
-- Múltiples técnicos o asignación de ticket (PRD §8)
+- Cuentas compartidas de un local, visibilidad cruzada o asignación de ticket (PRD §8)
 - Cobros / costos reales más allá del `estimated_cost` del ticket
 
 ## Modelo de datos
@@ -253,5 +253,5 @@ No testear envío de mail ni ruta `/t/{token}`.
 - Cada ticket tiene `public_token` único listo para el spec 03
 - El seeder deja tickets de demo en varios estados para `test@example.com`
 - Un usuario no ve tickets de otro
-- No hay `businesses` ni `business_id`
+- No hay `brands` ni `brand_id`
 - No se envía correo y no existe aún el listado filtrable ni la página pública

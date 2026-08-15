@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Cerrar el PRD §6.6: el usuario paga $3/mes por PayPal o Binance, sube el comprobante, el admin lo revisa en la web y marca pagado. Si una cuenta no está **marcada como pagada** los primeros 5 días del mes, se suspende (sin dashboard ni tickets) hasta que el admin marque pagado.
+Cerrar el PRD §6.6: el técnico paga $3/mes **por persona** por PayPal o Binance, sube el comprobante, el admin lo revisa en la web y marca pagado. Si una cuenta no está **marcada como pagada** los primeros 5 días del mes, se suspende (sin dashboard ni tickets) hasta que el admin marque pagado. Tres técnicos en el mismo local = tres suscripciones.
 
 No hay Stripe ni cobro automático. El precio y los métodos ya están en la landing ([`resources/js/pages/Welcome.vue`](../../resources/js/pages/Welcome.vue) §precio / FAQ).
 
@@ -38,13 +38,13 @@ Este spec **no** depende del spec 05. Se implementa después de 01–04; el bran
 ## Fuera de alcance
 
 - Stripe, webhooks, suscripciones automáticas o cualquier pasarela
-- Cobros del taller a *su* cliente (el `estimated_cost` del ticket no se cobra aquí)
+- Cobros del técnico a *su* cliente (el `estimated_cost` del ticket no se cobra aquí)
 - Link firmado sin login para marcar pagado
 - Cancelación explícita de la suscripción (si no paga el mes siguiente, el cron la suspende)
 - Cobrar meses atrasados: pagar el periodo **actual** reactiva
 - Prorrateo, cupones, planes distintos de $3/mes
 - Bloquear `/t/{token}` cuando el dueño está suspendido
-- Branding por negocio (spec 05)
+- Marca personal (spec 05)
 - Roles más allá de `is_admin`
 
 ## Modelo de datos
@@ -389,7 +389,7 @@ POST  /admin/payments/{payment}/reject   admin.payments.reject
 - Subject: “Tu cuenta fue suspendida”
 - CTA a `/billing`
 
-`from` = config de la app (mismo criterio que spec 02). No branding de taller.
+`from` = config de la app (mismo criterio que spec 02). No marca personal.
 
 ### Inertia share
 

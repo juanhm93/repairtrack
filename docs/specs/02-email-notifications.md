@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Cerrar el PRD §6.3 **sin marca por taller**: al crear un ticket y en cada cambio de estado, el cliente recibe un correo automático con un link único al status. El envío va por cola y queda un log por ticket para soporte.
+Cerrar el PRD §6.3 **sin marca personal**: al crear un ticket y en cada cambio de estado, el cliente recibe un correo automático con un link único al status. El envío va por cola y queda un log por ticket para soporte.
 
-El remitente y el nombre son los de la app (`config('mail.from')`, `config('app.name')`). Logo, colores y remitente por negocio son el spec 05.
+El remitente y el nombre son los de la app (`config('mail.from')`, `config('app.name')`). Logo, colores y remitente del técnico son el spec 05.
 
 ## Dependencias
 
@@ -25,7 +25,7 @@ El remitente y el nombre son los de la app (`config('mail.from')`, `config('app.
 ## Fuera de alcance
 
 - Implementar la página pública (spec 03); solo el URL
-- Logo, colores, `sender_name` / `sender_email` por negocio (spec 05)
+- Logo, colores, `sender_name` / `sender_email` del técnico (spec 05)
 - SMS / WhatsApp (PRD §8)
 - Reenvío manual desde UI, bandeja de notificaciones, o panel de soporte
 - Personalizar el cuerpo del correo por estado más allá de subject + label del estado
@@ -55,13 +55,13 @@ Relación: `RepairTicket::notifications()` hasMany `TicketNotification`.
 - Implements `ShouldQueue`
 - Via `mail`
 - Constructor: `RepairTicket $ticket`, `string $type` (`created` | `status_changed`)
-- Eager-load seguro: el job recarga `ticket.customer` (y `ticket.user` solo si hace falta el nombre del taller en el futuro; ahora no)
+- Eager-load seguro: el job recarga `ticket.customer` (y `ticket.user` solo si hace falta el nombre del técnico en el futuro; ahora no)
 - `from`: `config('mail.from.address')` + `config('mail.from.name')` (default de Laravel; no override por usuario)
 - Subject:
   - created: “Recibimos tu equipo — {app.name}”
   - status_changed: “Actualización de tu reparación — {status label}”
 - Markdown o view (`emails.ticket-status`) con:
-  - Nombre de la app (no logo de taller)
+  - Nombre de la app (no logo del técnico)
   - Nombre del cliente, tipo/marca/modelo, estado actual (label ES)
   - Nota del último cambio de historial, si existe
   - CTA: “Ver el status de tu equipo” → URL pública del token
@@ -138,7 +138,7 @@ El controller `show` incluye `latestNotification` (o la última de `notification
 ## Criterios de aceptación
 
 - Crear o cambiar estado de un ticket encola un correo al cliente
-- El correo se identifica como RepairTrack (nombre/from de la app), no como un taller
+- El correo se identifica como RepairTrack (nombre/from de la app), no como el técnico
 - El correo incluye un link `/t/{public_token}`
 - Queda un registro en `ticket_notifications` por envío
 - Show muestra el último correo

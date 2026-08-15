@@ -100,7 +100,7 @@ const toggleTheme = () => {
             <div class="hero__inner container">
                 <div class="hero__copy">
                     <span class="hero__eyebrow"
-                        >Para talleres de reparación</span
+                        >Para el que repara, no para el taller entero</span
                     >
                     <h1 class="hero__title">
                         Ese cuaderno con el celular de un cliente
@@ -108,7 +108,7 @@ const toggleTheme = () => {
                         ya no tiene que existir.
                     </h1>
                     <p class="hero__subtitle">
-                        RepairTrack ordena cada equipo que entra a tu taller:
+                        RepairTrack ordena cada equipo que te dejan a ti:
                         quién lo dejó, en qué va y cuándo lo retira.
                         <strong>Un poquito de orden nunca está de más</strong>
                         — y tus clientes dejan de llamarte cada dos días para
@@ -116,7 +116,7 @@ const toggleTheme = () => {
                     </p>
                     <div class="hero__actions">
                         <a href="#precio" class="btn btn--primary"
-                            >Quiero ordenar mi taller — $3/mes</a
+                            >Quiero ordenar mis reparaciones — $3/mes</a
                         >
                         <a href="#funciona" class="btn btn--ghost"
                             >Ver cómo funciona</a
@@ -185,9 +185,10 @@ const toggleTheme = () => {
 
         <div class="trust container">
             <p class="trust__label">
-                Hecho para talleres de celulares, consolas, laptops y cualquier
-                cosa que la gente deje "por un ratico" y venga a buscar en tres
-                meses.
+                Hecho para el que repara consolas, el que repara teléfonos, el
+                que repara laptops — aunque compartan el mismo mostrador. Y
+                cualquier cosa que la gente deje "por un ratico" y venga a
+                buscar en tres meses.
             </p>
         </div>
 
@@ -196,7 +197,7 @@ const toggleTheme = () => {
                 <div class="section__head">
                     <span class="section__eyebrow">¿Te suena familiar?</span>
                     <h2 class="section__title">
-                        Tu taller no tiene un problema de reparación. Tiene un
+                        Tú no tienes un problema de reparación. Tienes un
                         problema de memoria.
                     </h2>
                     <p class="section__subtitle">
@@ -239,7 +240,7 @@ const toggleTheme = () => {
                             </div>
                             <p class="pain__card-text">
                                 Una consola sin nombre en el mostrador desde
-                                hace un mes, y nadie recuerda quién la trajo ni
+                                hace un mes, y ya no recuerdas quién la trajo ni
                                 por qué.
                             </p>
                         </div>
@@ -351,9 +352,9 @@ const toggleTheme = () => {
                             Con tu marca, no la nuestra
                         </div>
                         <p class="features__card-text">
-                            Logo y colores de tu negocio en cada correo y en la
-                            página de status. Tu cliente ve tu taller, no una
-                            app genérica.
+                            Logo y colores tuyos en cada correo y en la página
+                            de status. Tu cliente ve tu nombre, no una app
+                            genérica.
                         </p>
                     </div>
                     <div class="features__card">
@@ -453,7 +454,7 @@ const toggleTheme = () => {
             <div class="container">
                 <div class="section__head">
                     <span class="section__eyebrow"
-                        >De la puerta del taller al correo del cliente</span
+                        >Del mostrador al correo del cliente</span
                     >
                     <h2 class="section__title">Así de simple es el proceso</h2>
                 </div>
@@ -521,10 +522,10 @@ const toggleTheme = () => {
                 </div>
                 <div class="pricing__wrap">
                     <div class="pricing__card">
-                        <span class="pricing__badge">Plan taller</span>
+                        <span class="pricing__badge">Plan personal</span>
                         <div class="pricing__amount">$3<span>/mes</span></div>
                         <p class="pricing__note">
-                            Un negocio, equipos ilimitados, correos ilimitados.
+                            Tu cuenta, tus clientes, equipos ilimitados.
                         </p>
                         <ul class="pricing__list">
                             <li class="pricing__list-item">
@@ -643,7 +644,7 @@ const toggleTheme = () => {
                     </details>
                     <details class="faq__item">
                         <summary class="faq__question">
-                            ¿Puedo usar el logo y los colores de mi taller?
+                            ¿Puedo usar mi logo y mis colores?
                             <span class="faq__question-icon">
                                 <svg
                                     width="18"
@@ -662,6 +663,30 @@ const toggleTheme = () => {
                             Sí, es justo la idea. Los correos y la vista de
                             status llevan tu marca — tu cliente ni se entera de
                             que existe RepairTrack detrás.
+                        </p>
+                    </details>
+                    <details class="faq__item">
+                        <summary class="faq__question">
+                            ¿Si trabajo en un local con otros técnicos, ellos
+                            ven mis clientes?
+                            <span class="faq__question-icon">
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2.4"
+                                    stroke-linecap="round"
+                                >
+                                    <path d="M12 5v14M5 12h14" />
+                                </svg>
+                            </span>
+                        </summary>
+                        <p class="faq__answer">
+                            No. Cada cuenta es de una persona. Tus clientes, tus
+                            precios y tus tickets son solo tuyos — aunque
+                            compartan el mismo mostrador.
                         </p>
                     </details>
                     <details class="faq__item">
@@ -705,8 +730,8 @@ const toggleTheme = () => {
                         </summary>
                         <p class="faq__answer">
                             Sí — consolas, laptops, tablets o cualquier equipo
-                            que entre y salga de tu taller. El tipo de equipo lo
-                            defines tú.
+                            que te dejen y te vengan a buscar. El tipo de equipo
+                            lo defines tú.
                         </p>
                     </details>
                     <details class="faq__item">
@@ -743,7 +768,7 @@ const toggleTheme = () => {
                 </h2>
                 <div class="final__actions">
                     <a href="#precio" class="btn btn--primary"
-                        >Ordenar mi taller por $3/mes</a
+                        >Ordenar mis equipos por $3/mes</a
                     >
                     <a href="#problema" class="btn btn--ghost"
                         >Todavía no estoy seguro</a
@@ -758,7 +783,7 @@ const toggleTheme = () => {
                     <span class="footer__brand-accent">Repair</span>Track
                 </span>
                 <span class="footer__note">
-                    Hecho para talleres que ya no quieren depender de un
+                    Hecho para el técnico que ya no quiere depender de un
                     cuaderno. © 2026 RepairTrack.
                 </span>
             </div>
