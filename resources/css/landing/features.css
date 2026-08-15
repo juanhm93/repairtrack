@@ -1,0 +1,64 @@
+/* ===========================================================
+   Landing — features
+   =========================================================== */
+
+.features__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 720px) {
+    .features__grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.features__card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-md);
+    padding: 26px 22px;
+    border: 1px solid var(--border-soft);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.features__card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-soft);
+}
+
+.features__card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--color-primary-100);
+    color: var(--accent-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+}
+
+html.dark .features__card-icon {
+    background: rgba(85, 169, 204, 0.14);
+}
+
+.features__card-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.features__card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 8px;
+}
+
+.features__card-text {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.6;
+}

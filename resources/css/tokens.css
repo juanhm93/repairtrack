@@ -1,0 +1,114 @@
+/* ===========================================================
+   Design tokens — RepairTrack
+   Source of truth for landing and the authenticated app.
+   =========================================================== */
+
+:root {
+    /* Brand */
+    --color-primary-500: #1f7ea5;
+    --color-primary-600: #175f7d;
+    --color-primary-700: #114c64;
+    --color-primary-100: #dceef5;
+
+    --color-secondary-500: #e08828;
+    --color-secondary-600: #be6e1a;
+    --color-secondary-100: #fbe7ce;
+
+    --color-ink-900: #16232e;
+    --color-ink-700: #33454f;
+    --color-ink-500: #5c6b74;
+
+    --color-paper-000: #ffffff;
+    --color-paper-050: #f7f6f2;
+    --color-paper-100: #eeece5;
+
+    /* Typography */
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-hand: 'Caveat', cursive;
+
+    /* Shape */
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+
+    /* Elevation */
+    --shadow-soft: 0 12px 32px -16px rgba(22, 35, 46, 0.25);
+    --shadow-lift: 0 20px 45px -18px rgba(22, 35, 46, 0.35);
+
+    --container: 1120px;
+
+    /* Semantic — light */
+    --bg-page: var(--color-paper-050);
+    --bg-surface: var(--color-paper-000);
+    --bg-surface-alt: var(--color-paper-100);
+    --text-primary: var(--color-ink-900);
+    --text-muted: var(--color-ink-500);
+    --border-soft: rgba(22, 35, 46, 0.1);
+    --accent: var(--color-primary-500);
+    --accent-strong: var(--color-primary-700);
+    --cta-bg: var(--color-secondary-500);
+    --cta-bg-hover: var(--color-secondary-600);
+    --cta-text: #1a1206;
+    --app-accent-wash: var(--color-primary-100);
+
+    /* App / shadcn semantic tokens (mapped to the same palette) */
+    --background: var(--bg-page);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --card-foreground: var(--text-primary);
+    --popover: var(--bg-surface);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--color-primary-500);
+    --primary-foreground: #ffffff;
+    --secondary: var(--color-secondary-100);
+    --secondary-foreground: var(--color-secondary-600);
+    --muted: var(--bg-surface-alt);
+    --muted-foreground: var(--text-muted);
+    --accent-foreground: var(--color-primary-700);
+    --destructive: #c23b22;
+    --destructive-foreground: #ffffff;
+    --border: var(--border-soft);
+    --input: var(--border-soft);
+    --ring: var(--color-primary-500);
+    --radius: var(--radius-md);
+    --chart-1: var(--color-primary-500);
+    --chart-2: var(--color-secondary-500);
+    --chart-3: var(--color-primary-700);
+    --chart-4: var(--color-ink-700);
+    --chart-5: var(--color-secondary-600);
+    --sidebar-background: var(--bg-surface);
+    --sidebar-foreground: var(--text-primary);
+    --sidebar-primary: var(--color-primary-500);
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: var(--color-primary-100);
+    --sidebar-accent-foreground: var(--color-primary-700);
+    --sidebar-border: var(--border-soft);
+    --sidebar-ring: var(--color-primary-500);
+    --sidebar: var(--bg-surface);
+}
+
+html.dark {
+    --bg-page: #0e161c;
+    --bg-surface: #142029;
+    --bg-surface-alt: #1b2932;
+    --text-primary: #f2f3f1;
+    --text-muted: #a9b4bb;
+    --border-soft: rgba(255, 255, 255, 0.1);
+    --accent: #55a9cc;
+    --accent-strong: #8fcbe4;
+    --cta-bg: #e9973a;
+    --cta-bg-hover: #f2ac5c;
+    --cta-text: #1a1206;
+    --app-accent-wash: rgba(85, 169, 204, 0.14);
+
+    --primary: #55a9cc;
+    --primary-foreground: #0e161c;
+    --secondary: rgba(233, 151, 58, 0.18);
+    --secondary-foreground: #e9973a;
+    --accent-foreground: #8fcbe4;
+    --sidebar-accent: rgba(85, 169, 204, 0.14);
+    --sidebar-accent-foreground: #8fcbe4;
+    --sidebar-primary: #55a9cc;
+    --sidebar-primary-foreground: #0e161c;
+}

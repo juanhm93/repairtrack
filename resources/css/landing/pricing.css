@@ -1,0 +1,112 @@
+/* ===========================================================
+   Landing — pricing
+   =========================================================== */
+
+.pricing__wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.pricing__card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg);
+    padding: 36px 32px;
+    box-shadow: var(--shadow-soft);
+    text-align: center;
+}
+
+.pricing__badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cta-text);
+    background: var(--cta-bg);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+}
+
+.pricing__amount {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 3.4rem;
+    letter-spacing: -0.02em;
+}
+
+.pricing__amount span {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.pricing__note {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.pricing__list {
+    margin: 26px 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pricing__list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.92rem;
+}
+
+.pricing__list-icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.pricing__list-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.pricing__pay {
+    border-top: 1px solid var(--border-soft);
+    margin-top: 22px;
+    padding-top: 20px;
+}
+
+.pricing__pay-label {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.pricing__pay-methods {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pricing__pay-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--bg-surface-alt);
+}

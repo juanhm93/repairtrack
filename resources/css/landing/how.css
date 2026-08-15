@@ -1,0 +1,46 @@
+/* ===========================================================
+   Landing — how it works
+   =========================================================== */
+
+.how__steps {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    counter-reset: step;
+}
+
+@media (min-width: 860px) {
+    .how__steps {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+.how__step {
+    position: relative;
+    padding: 26px 20px 20px;
+    border-top: 3px solid var(--accent);
+    counter-increment: step;
+}
+
+.how__step::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+}
+
+.how__step-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    margin: 10px 0 8px;
+}
+
+.how__step-text {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.55;
+}

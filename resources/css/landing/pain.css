@@ -1,0 +1,43 @@
+/* ===========================================================
+   Landing — pain
+   =========================================================== */
+
+.pain__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+}
+
+@media (min-width: 720px) {
+    .pain__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.pain__card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 22px;
+    display: flex;
+    gap: 14px;
+}
+
+.pain__card-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.pain__card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    margin-bottom: 6px;
+}
+
+.pain__card-text {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.55;
+}

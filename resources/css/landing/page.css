@@ -1,0 +1,10 @@
+/* ===========================================================
+   Landing — page shell
+   =========================================================== */
+
+.landing {
+    min-height: 100vh;
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+}
