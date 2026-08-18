@@ -17,6 +17,7 @@ const toggleTheme = () => {
         <header class="header">
             <div class="header__inner container">
                 <a href="#top" class="header__brand">
+                    <!-- agregar logo aqui luego -->
                     <!-- <span class="header__brand-logo">Logo</span> -->
                     <span>
                         <span class="header__brand-repair">Repair</span
