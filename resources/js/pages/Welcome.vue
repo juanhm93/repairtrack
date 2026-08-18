@@ -17,7 +17,7 @@ const toggleTheme = () => {
         <header class="header">
             <div class="header__inner container">
                 <a href="#top" class="header__brand">
-                    <span class="header__brand-logo">Logo</span>
+                    <!-- <span class="header__brand-logo">Logo</span> -->
                     <span>
                         <span class="header__brand-repair">Repair</span
                         ><span class="header__brand-track">Track</span>
@@ -108,8 +108,8 @@ const toggleTheme = () => {
                         ya no tiene que existir.
                     </h1>
                     <p class="hero__subtitle">
-                        RepairTrack ordena cada equipo que te dejan a ti:
-                        quién lo dejó, en qué va y cuándo lo retira.
+                        RepairTrack ordena cada equipo que te dejan a ti: quién
+                        lo dejó, en qué va y cuándo lo retira.
                         <strong>Un poquito de orden nunca está de más</strong>
                         — y tus clientes dejan de llamarte cada dos días para
                         preguntar.
