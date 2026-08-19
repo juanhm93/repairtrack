@@ -91,7 +91,9 @@ const formatDate = (value: string | null): string => {
                                 v-slot="{ processing }"
                             >
                                 <DialogHeader class="space-y-3">
-                                    <DialogTitle>Correr migraciones</DialogTitle>
+                                    <DialogTitle
+                                        >Correr migraciones</DialogTitle
+                                    >
                                     <DialogDescription>
                                         Se van a aplicar las migraciones
                                         pendientes en este servidor. Confirma

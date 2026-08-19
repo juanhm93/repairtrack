@@ -56,7 +56,7 @@ Filtros aceptados (todos opcionales):
 | `status` | Exact match a un valor de `TicketStatus` |
 | `received_from` / `received_to` | Rango inclusivo sobre `received_at` |
 | `delivery_from` / `delivery_to` | Rango inclusivo sobre `estimated_delivery_at` |
-| `device_type` | Exact match (`celular`, `consola`, `otro`) |
+| `device_type` | Exact match (`celular`, `tablet`, `laptop`, `pc_desktop`, `consola`, `otro`) |
 | `q` | Búsqueda LIKE sobre `customers.name`, `customers.email`, `customers.phone` |
 
 Default (sin `status`): foco en pendientes = `status` not in (`delivered`). El usuario puede filtrar explícitamente a `delivered` para verlos.
@@ -78,7 +78,7 @@ index(Request $request): Response
 
 `statusOptions`: lista `{ value, label }` del enum, para el select.
 
-Validación de filtros: `status` nullable|enum, fechas `date`, `device_type` nullable|in:celular,consola,otro, `q` nullable|string|max:100. Fechas `*_to` after_or_equal a `*_from` cuando ambas vienen.
+Validación de filtros: `status` nullable|enum, fechas `date`, `device_type` nullable|in:celular,tablet,laptop,pc_desktop,consola,otro, `q` nullable|string|max:100. Fechas `*_to` after_or_equal a `*_from` cuando ambas vienen.
 
 ### Rutas
 

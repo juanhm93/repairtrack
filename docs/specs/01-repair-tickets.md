@@ -17,10 +17,14 @@ Todo es **por persona**: un ticket y un cliente pertenecen al `User` que los cre
 
 ## Alcance
 
-- Tablas `customers`, `repair_tickets`, `ticket_status_history`
+- Tablas `customers`, `repair_tickets`, `ticket_status_history`, `ticket_photos`
 - Enum `TicketStatus` con los 7 estados del PRD
-- `TicketService`: crear ticket (find-or-create customer), cambiar estado, escribir historial
-- Páginas autenticadas: crear ticket y ver ticket (datos + timeline + cambio de estado)
+- `TicketService`: crear ticket (find-or-create customer), cambiar estado, escribir historial, guardar fotos
+- Catálogo curado de marcas/modelos (`config/devices.php`) + historial del técnico en el formulario
+- Número de serie opcional
+- Dictado por voz al problema reportado (solo transcripción, sin audio)
+- Hasta 5 fotos del equipo en disco `public` (`php artisan storage:link`)
+- Páginas autenticadas: crear ticket y ver ticket (datos + fotos + timeline + cambio de estado)
 - Nav “Nuevo ticket”
 - Factory, seeder y tests
 
@@ -33,6 +37,11 @@ Todo es **por persona**: un ticket y un cliente pertenecen al `User` que los cre
 - Vista dedicada de historial por cliente (PRD §8)
 - Cuentas compartidas de un local, visibilidad cruzada o asignación de ticket (PRD §8)
 - Cobros / costos reales más allá del `estimated_cost` del ticket
+- Catálogo exhaustivo de SKUs o API externa de modelos
+- Guardar el audio de la nota de voz
+- Webcam en escritorio (`getUserMedia`)
+- Fotos o número de serie en la vista pública `/t/{token}` (spec 03)
+- Editar fotos después de crear el ticket
 
 ## Modelo de datos
 
@@ -75,10 +84,11 @@ Unique compuesto: `['user_id', 'email']` — un cliente se reutiliza por correo 
 | `user_id` | FK `users.id` | Dueño del ticket |
 | `customer_id` | FK `customers.id` | |
 | `public_token` | string, unique | Token opaco para la vista pública (spec 03) |
-| `device_type` | string | Ej. celular, consola, otro |
-| `brand` | string, nullable | |
-| `model` | string, nullable | |
-| `reported_issue` | text | Problema reportado |
+| `device_type` | string | Ej. celular, tablet, laptop, pc_desktop, consola, otro |
+| `brand` | string, nullable | Sugerido (catálogo + historial); texto libre |
+| `model` | string, nullable | Sugerido (filtrado por marca); texto libre |
+| `serial_number` | string, nullable | IMEI / número de serie; interno, no va a spec 03 |
+| `reported_issue` | text | Problema reportado (también se puede dictar) |
 | `estimated_cost` | decimal(10,2), nullable | |
 | `received_at` | date | Fecha de recepción |
 | `estimated_delivery_at` | date, nullable | Fecha estimada de entrega |
@@ -88,6 +98,29 @@ Unique compuesto: `['user_id', 'email']` — un cliente se reutiliza por correo 
 Índices: `user_id`, `status`, `received_at`, `estimated_delivery_at`, `customer_id`.
 
 `public_token`: string aleatorio URL-safe (p.ej. 32 chars `Str::random(32)`), único, generado al crear. No es el id.
+
+### `ticket_photos`
+
+| Columna | Tipo | Notas |
+|---------|------|--------|
+| `id` | bigint PK | |
+| `repair_ticket_id` | FK `repair_tickets.id` | cascade delete |
+| `path` | string | Relativo al disco `public` |
+| `sort_order` | unsignedTinyInteger | 0–4 |
+| `created_at` / `updated_at` | timestamps | |
+
+Hasta 5 fotos por ticket. Archivos en `tickets/{user_id}/{ticket_id}/{uuid}.{ext}` en el disco `public`. El JSON de Inertia expone `url`, no `path`.
+
+Requisito local: `php artisan storage:link` (enlace `public/storage` → `storage/app/public`, ya definido en [`config/filesystems.php`](../../config/filesystems.php)). El script `composer setup` lo ejecuta.
+
+### Catálogo de equipos
+
+[`config/devices.php`](../../config/devices.php): marcas y modelos populares **por `device_type`**. No es un catálogo exhaustivo. En create se pasa:
+
+- `deviceCatalog` — el config
+- `deviceHistory` — `distinct device_type, brand, model` de los tickets **del usuario autenticado**
+
+El frontend mergea historial + catálogo. Marca y modelo siguen siendo texto libre.
 
 ### `ticket_status_history`
 
@@ -105,8 +138,9 @@ Unique compuesto: `['user_id', 'email']` — un cliente se reutiliza por correo 
 
 - `User` hasMany `Customer`, hasMany `RepairTicket`
 - `Customer` belongsTo `User`, hasMany `RepairTicket`
-- `RepairTicket` belongsTo `User`, belongsTo `Customer`, hasMany `TicketStatusHistory`
+- `RepairTicket` belongsTo `User`, belongsTo `Customer`, hasMany `TicketStatusHistory`, hasMany `TicketPhoto`
 - `TicketStatusHistory` belongsTo `RepairTicket`, belongsTo `User` (`changed_by`)
+- `TicketPhoto` belongsTo `RepairTicket`
 
 Casts en `RepairTicket`: `status` → `TicketStatus`, fechas → `date`, `estimated_cost` → `decimal:2`.
 
@@ -117,11 +151,12 @@ Casts en `RepairTicket`: `status` → `TicketStatus`, fechas → `date`, `estima
 Toda la mutación de tickets pasa por aquí.
 
 ```
-create(User $actor, array $data): RepairTicket
+create(User $actor, array $data, array $photos = []): RepairTicket
   - find-or-create Customer por (user_id, email)
     - si existe: actualizar name/phone si vinieron más recientes
   - crear RepairTicket con user_id del actor, status received, public_token nuevo
   - escribir primer TicketStatusHistory (from=null, to=received, note opcional de recepción)
+  - guardar fotos (máx. 5) en disco `public` con nombre UUID
   - todo en transacción
 
 changeStatus(RepairTicket $ticket, User $actor, TicketStatus $to, ?string $note): RepairTicket
@@ -142,9 +177,9 @@ No envía notificaciones. Spec 02 engancha este servicio.
 ### Controller — `app/Http/Controllers/TicketController.php`
 
 ```
-create  → Inertia tickets/Create
+create  → Inertia tickets/Create (customers, deviceCatalog, deviceHistory)
 store   → TicketService::create → redirect tickets.show + toast
-show    → Inertia tickets/Show (ticket + customer + history.changedBy)
+show    → Inertia tickets/Show (ticket + customer + history.changedBy + photos)
 updateStatus → TicketService::changeStatus → back + toast
 ```
 
@@ -155,7 +190,8 @@ No hay `index` aquí (spec 04). No hay `destroy` en el MVP.
 `StoreTicketRequest`:
 
 - Cliente: `customer_name` required, `customer_phone` nullable, `customer_email` required|email
-- Equipo: `device_type` required, `brand` nullable, `model` nullable, `reported_issue` required
+- Equipo: `device_type` required, `brand` nullable, `model` nullable, `serial_number` nullable|max:255, `reported_issue` required
+- `photos` nullable|array|max:5; `photos.*` image|mimes:jpeg,jpg,png,webp|max:4096
 - `estimated_cost` nullable|numeric|min:0
 - `received_at` required|date
 - `estimated_delivery_at` nullable|date|after_or_equal:received_at
@@ -191,25 +227,35 @@ Customer = { id, name, phone, email }
 
 TicketStatusHistoryItem = { id, from_status, to_status, note, changed_by: { id, name } | null, created_at }
 
+TicketPhoto = { id, url, sort_order }
+
 RepairTicket = {
-  id, public_token, device_type, brand, model, reported_issue,
+  id, public_token, device_type, brand, model, serial_number, reported_issue,
   estimated_cost, received_at, estimated_delivery_at, status,
   customer: Customer,
-  history: TicketStatusHistoryItem[]
+  history: TicketStatusHistoryItem[],
+  photos: TicketPhoto[]
 }
+
+DeviceCatalog = Record<device_type, Record<brand, model[]>>
+DeviceHistoryItem = { device_type, brand, model }
 ```
 
 ### `resources/js/pages/tickets/Create.vue`
 
 - `AppLayout`, breadcrumb Dashboard → Nuevo ticket
-- Form: datos del cliente, tipo/marca/modelo, problema, costo estimado, fecha recepción, fecha estimada de entrega
-- `device_type`: select con valores `celular`, `consola`, `otro` (cubre el filtro del spec 04)
-- Submit → `tickets.store`
+- Form: datos del cliente, tipo/marca/modelo (autocomplete), número de serie, problema (textarea + dictado), fotos, costo estimado, fecha recepción, fecha estimada de entrega
+- `device_type`: select con valores `celular`, `tablet`, `laptop`, `pc_desktop`, `consola`, `otro` (cubre el filtro del spec 04)
+- Marca y modelo: `SuggestInput` con sugerencias del catálogo filtradas por tipo (modelos por marca) mergeadas con `deviceHistory`; texto libre si no hay match
+- Problema reportado: botón de dictado (Web Speech API, `es-DO` / `es`). Si el navegador no soporta, toast; el textarea sigue siendo el camino principal. El texto dictado se añade al campo. No se guarda audio
+- Fotos: hasta 5. Botón “Tomar foto” (`capture="environment"`, abre cámara en móvil) y “Elegir de galería” (sin `capture`). Previews con quitar. En escritorio `capture` se ignora (file picker)
+- Submit → `tickets.store` (multipart si hay fotos)
 
 ### `resources/js/pages/tickets/Show.vue`
 
 - Breadcrumb Dashboard → Ticket #{id}
-- Bloque de cliente y equipo
+- Bloque de cliente y equipo (incluye número de serie si existe)
+- Galería de fotos del equipo (thumbnails con `url`)
 - Badge del estado actual (label en español)
 - Form compacto: select de nuevo estado + nota opcional + submit
 - Timeline de `history` ordenada cronológicamente (creación primero)
@@ -236,6 +282,9 @@ El listado vive en el dashboard (spec 04); no agregar un ítem “Tickets” vac
 
 - Guest no accede a create/show
 - User autenticado crea ticket: persiste customer, ticket `received`, `public_token`, primer history, `user_id` del actor
+- Create incluye `deviceCatalog` y `deviceHistory` solo de tickets del usuario (no de otro)
+- Create persiste `serial_number` opcional
+- Create con fotos: persiste hasta 5 en disco `public`; más de 5 o mime inválido → 422
 - Mismo email en el mismo usuario reutiliza el customer (no duplica)
 - Mismo email en otro usuario crea otro customer
 - Show carga ticket + customer + history
@@ -254,4 +303,8 @@ No testear envío de mail ni ruta `/t/{token}`.
 - El seeder deja tickets de demo en varios estados para `test@example.com`
 - Un usuario no ve tickets de otro
 - No hay `brands` ni `brand_id`
+- Marca/modelo se sugieren desde catálogo + historial propio; se puede escribir texto libre
+- Se puede guardar número de serie y hasta 5 fotos del equipo
+- El problema reportado se puede dictar al textarea (sin persistir audio)
 - No se envía correo y no existe aún el listado filtrable ni la página pública
+- Fotos y serie no se exponen en spec 03
