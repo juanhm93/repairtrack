@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\Admin\OwnerController;
+use App\Http\Controllers\PublicTicketController;
 use App\Http\Controllers\TicketController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+Route::get('t/{token}', [PublicTicketController::class, 'show'])->name('public.tickets.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\TicketNotificationType;
 use App\Enums\TicketStatus;
 use App\Models\Customer;
 use App\Models\RepairTicket;
@@ -16,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 
 class TicketService
 {
+    public function __construct(private TicketNotificationService $notifications) {}
+
     /**
      * @param  array{
      *     customer_name?: string|null,
@@ -62,7 +65,11 @@ class TicketService
 
             $this->storePhotos($ticket, $actor, $photos);
 
-            return $ticket->load(['customer', 'history.changedBy', 'photos']);
+            $ticket = $ticket->load(['customer', 'history.changedBy', 'photos']);
+
+            $this->notifications->notify($ticket, TicketNotificationType::Created);
+
+            return $ticket;
         });
     }
 
@@ -92,7 +99,11 @@ class TicketService
                 'changed_by' => $actor->id,
             ]);
 
-            return $ticket->refresh()->load(['customer', 'history.changedBy']);
+            $ticket = $ticket->refresh()->load(['customer', 'history.changedBy']);
+
+            $this->notifications->notify($ticket, TicketNotificationType::StatusChanged);
+
+            return $ticket;
         });
     }
 

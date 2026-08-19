@@ -34,6 +34,12 @@ export type TicketPhoto = {
     sort_order: number;
 };
 
+export type TicketNotificationLog = {
+    to_email: string;
+    status: 'queued' | 'sent' | 'failed';
+    created_at: string;
+};
+
 export type DeviceCatalog = Record<string, Record<string, string[]>>;
 
 export type DeviceHistoryItem = {
@@ -60,6 +66,7 @@ export type RepairTicket = TicketListItem & {
     reported_issue: string;
     history: TicketStatusHistoryItem[];
     photos: TicketPhoto[];
+    latest_notification?: TicketNotificationLog | null;
 };
 
 export type TicketIndexFilters = {
@@ -116,4 +123,18 @@ export const ticketStatusVariant = (
     }
 
     return 'default';
+};
+
+export const ticketNotificationStatusLabel = (
+    status: TicketNotificationLog['status'],
+): string => {
+    if (status === 'queued') {
+        return 'En cola';
+    }
+
+    if (status === 'sent') {
+        return 'Enviado';
+    }
+
+    return 'Fallido';
 };

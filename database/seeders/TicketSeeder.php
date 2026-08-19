@@ -2,12 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Enums\TicketNotificationType;
 use App\Enums\TicketStatus;
 use App\Models\Customer;
 use App\Models\RepairTicket;
+use App\Models\TicketNotification;
 use App\Models\User;
 use App\Services\TicketService;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Notification;
 
 class TicketSeeder extends Seeder
 {
@@ -16,6 +19,8 @@ class TicketSeeder extends Seeder
      */
     public function run(): void
     {
+        Notification::fake();
+
         $user = User::query()->where('email', 'test@example.com')->firstOrFail();
         $tickets = app(TicketService::class);
 
@@ -113,5 +118,24 @@ class TicketSeeder extends Seeder
             'reported_issue' => 'Joy-Con con drift',
             'estimated_cost' => 45,
         ]);
+
+        TicketNotification::query()->delete();
+
+        $demoTickets = RepairTicket::query()
+            ->with('customer')
+            ->orderBy('id')
+            ->limit(2)
+            ->get();
+
+        foreach ($demoTickets as $index => $ticket) {
+            TicketNotification::factory()->create([
+                'repair_ticket_id' => $ticket->id,
+                'to_email' => $ticket->customer->email,
+                'ticket_status' => $ticket->status,
+                'type' => $index === 0
+                    ? TicketNotificationType::Created
+                    : TicketNotificationType::StatusChanged,
+            ]);
+        }
     }
 }

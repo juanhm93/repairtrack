@@ -19,7 +19,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { formatDate, formatDateTime } from '@/plugins/date';
 import { edit, index, show } from '@/routes/tickets';
 import type { RepairTicket, TicketStatus, TicketStatusOption } from '@/types';
-import { deviceTypeLabel, ticketStatusVariant } from '@/types';
+import {
+    deviceTypeLabel,
+    ticketNotificationStatusLabel,
+    ticketStatusVariant,
+} from '@/types';
 
 const props = defineProps<{
     ticket: RepairTicket;
@@ -286,6 +290,21 @@ const formatCost = (value: string | null): string => {
                     </CardContent>
                 </Card>
 
+                <p
+                    v-if="ticket.latest_notification"
+                    class="text-sm text-muted-foreground"
+                >
+                    Último correo:
+                    {{ ticket.latest_notification.to_email }}
+                    ·
+                    {{ formatDateTime(ticket.latest_notification.created_at) }}
+                    ·
+                    {{
+                        ticketNotificationStatusLabel(
+                            ticket.latest_notification.status,
+                        )
+                    }}
+                </p>
                 <p class="text-sm text-muted-foreground">
                     Link público (próximamente)
                 </p>

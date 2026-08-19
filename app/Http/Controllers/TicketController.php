@@ -141,6 +141,7 @@ class TicketController extends Controller
             'customer',
             'history.changedBy:id,name',
             'photos',
+            'latestNotification',
         ]);
 
         return Inertia::render('tickets/Show', [
