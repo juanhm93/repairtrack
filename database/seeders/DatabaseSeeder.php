@@ -24,6 +24,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('juan1234'),
         ]);
 
-        $this->call(TicketSeeder::class);
+        // $this->call(TicketSeeder::class);
     }
 }

@@ -351,9 +351,9 @@ class TicketTest extends TestCase
 
         $ticket->photos->each(function (TicketPhoto $photo) use ($ticket): void {
             $this->assertNotSame('', $photo->path);
-            $this->assertStringContainsString("tickets/{$ticket->user_id}/{$ticket->id}/", $photo->path);
+            $this->assertStringContainsString("uploads/tickets/{$ticket->user_id}/{$ticket->id}/", $photo->path);
             Storage::disk('public')->assertExists($photo->path);
-            $this->assertStringStartsWith('/tickets/', $photo->url);
+            $this->assertStringStartsWith('/uploads/tickets/', $photo->url);
             $this->assertStringContainsString($photo->path, $photo->url);
         });
 
@@ -633,7 +633,7 @@ class TicketTest extends TestCase
             'user_id' => $user->id,
         ]);
         $customerId = $ticket->customer_id;
-        $path = "tickets/{$user->id}/{$ticket->id}/front.jpg";
+        $path = "uploads/tickets/{$user->id}/{$ticket->id}/front.jpg";
 
         Storage::disk('public')->put($path, 'fake-image');
         $ticket->photos()->create([
@@ -652,6 +652,29 @@ class TicketTest extends TestCase
         $this->assertDatabaseMissing('ticket_status_history', ['repair_ticket_id' => $ticket->id]);
         $this->assertDatabaseMissing('ticket_photos', ['repair_ticket_id' => $ticket->id]);
         $this->assertDatabaseHas('customers', ['id' => $customerId]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_deleting_a_ticket_removes_legacy_photo_files(): void
+    {
+        Storage::fake('public', ['url' => '']);
+
+        $user = User::factory()->create();
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+        ]);
+        $path = "tickets/{$user->id}/{$ticket->id}/front.jpg";
+
+        Storage::disk('public')->put($path, 'fake-image');
+        $ticket->photos()->create([
+            'path' => $path,
+            'sort_order' => 0,
+        ]);
+
+        $this->actingAs($user)
+            ->delete(route('tickets.destroy', $ticket))
+            ->assertRedirect(route('tickets.index'));
+
         Storage::disk('public')->assertMissing($path);
     }
 

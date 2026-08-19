@@ -187,6 +187,7 @@ class TicketService
                 $disk->delete($photo->path);
             }
 
+            $disk->deleteDirectory($this->photoDirectory($actor, $ticket));
             $disk->deleteDirectory("tickets/{$actor->id}/{$ticket->id}");
 
             $ticket->delete();
@@ -225,7 +226,7 @@ class TicketService
             $extension = $photo->guessExtension() ?: $photo->getClientOriginalExtension() ?: 'jpg';
             $filename = Str::uuid()->toString().'.'.$extension;
             $path = $photo->storeAs(
-                "tickets/{$actor->id}/{$ticket->id}",
+                $this->photoDirectory($actor, $ticket),
                 $filename,
                 'public',
             );
@@ -241,5 +242,10 @@ class TicketService
                 'sort_order' => $index,
             ]);
         }
+    }
+
+    private function photoDirectory(User $actor, RepairTicket $ticket): string
+    {
+        return "uploads/tickets/{$actor->id}/{$ticket->id}";
     }
 }

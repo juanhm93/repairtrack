@@ -77,3 +77,4 @@ jobs:
             **/public/hot
             **/public/storage
             **/public/tickets/**
+            **/public/uploads/**
