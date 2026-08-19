@@ -26,34 +26,54 @@ class OwnerDashboardTest extends TestCase
         $this->post(route('admin.cache'))->assertRedirect(route('login'));
     }
 
-    public function test_authenticated_users_can_visit_the_owner_dashboard(): void
+    public function test_admins_can_visit_the_owner_dashboard(): void
     {
         $older = User::factory()->create([
             'name' => 'Técnico anterior',
             'email' => 'older@example.com',
             'created_at' => now()->subDay(),
         ]);
-        $newer = User::factory()->create([
+        $admin = User::factory()->admin()->create([
             'name' => 'Técnico reciente',
             'email' => 'newer@example.com',
             'created_at' => now(),
         ]);
 
-        $this->actingAs($newer)
+        $this->actingAs($admin)
             ->get(route('admin.index'))
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('admin/Index')
                 ->has('users', 2)
-                ->where('users.0.email', $newer->email)
+                ->where('users.0.email', $admin->email)
                 ->where('users.1.email', $older->email)
-                ->where('users.0.is_admin', false),
+                ->where('users.0.is_admin', true),
             );
+    }
+
+    public function test_non_admins_cannot_visit_the_owner_dashboard(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.index'))
+            ->assertForbidden();
+    }
+
+    public function test_non_admins_cannot_run_maintenance_actions(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)
+            ->post(route('admin.migrate'))
+            ->assertForbidden();
+
+        $this->actingAs($user)
+            ->post(route('admin.cache'))
+            ->assertForbidden();
     }
 
     public function test_running_migrations_promotes_the_authenticated_user_to_admin(): void
     {
-        $user = User::factory()->create(['is_admin' => false]);
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->from(route('admin.index'))
@@ -68,7 +88,7 @@ class OwnerDashboardTest extends TestCase
 
     public function test_authenticated_users_can_clear_the_application_cache(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->admin()->create();
 
         $this->actingAs($user)
             ->from(route('admin.index'))
