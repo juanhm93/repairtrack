@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,6 +34,8 @@ use Illuminate\Support\Facades\Auth;
  * @property-read User $user
  * @property-read Collection<int, TicketStatusHistory> $history
  * @property-read Collection<int, TicketPhoto> $photos
+ * @property-read Collection<int, TicketNotification> $notifications
+ * @property-read TicketNotification|null $latestNotification
  */
 #[Fillable([
     'user_id',
@@ -87,6 +90,22 @@ class RepairTicket extends Model
         return $this->hasMany(TicketPhoto::class)
             ->orderBy('sort_order')
             ->orderBy('id');
+    }
+
+    /**
+     * @return HasMany<TicketNotification, $this>
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(TicketNotification::class);
+    }
+
+    /**
+     * @return HasOne<TicketNotification, $this>
+     */
+    public function latestNotification(): HasOne
+    {
+        return $this->hasOne(TicketNotification::class)->latestOfMany();
     }
 
     /**
