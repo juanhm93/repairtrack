@@ -22,9 +22,9 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as admin } from '@/routes/admin';
 import { create } from '@/routes/tickets';
 import type { NavItem } from '@/types';
-import { index as admin } from '@/routes/admin';
 
 const page = usePage();
 
