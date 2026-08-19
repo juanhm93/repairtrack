@@ -4,24 +4,16 @@ namespace App\Notifications;
 
 use App\Enums\TicketNotificationType;
 use App\Models\RepairTicket;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class TicketStatusNotification extends Notification implements ShouldQueue
+class TicketStatusNotification extends Notification
 {
-    use Queueable;
-
-    public int $tries = 3;
-
     public function __construct(
         public RepairTicket $ticket,
         public TicketNotificationType $type,
         public int $notificationLogId,
-    ) {
-        $this->afterCommit = ! app()->runningUnitTests();
-    }
+    ) {}
 
     /**
      * @return list<string>

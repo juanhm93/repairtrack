@@ -38,7 +38,7 @@ class TicketService
      */
     public function create(User $actor, array $data, array $photos = []): RepairTicket
     {
-        return DB::transaction(function () use ($actor, $data, $photos): RepairTicket {
+        $ticket = DB::transaction(function () use ($actor, $data, $photos): RepairTicket {
             $customer = $this->findOrCreateCustomer($actor, $data);
 
             $ticket = RepairTicket::query()->create([
@@ -65,12 +65,12 @@ class TicketService
 
             $this->storePhotos($ticket, $actor, $photos);
 
-            $ticket = $ticket->load(['customer', 'history.changedBy', 'photos']);
-
-            $this->notifications->notify($ticket, TicketNotificationType::Created);
-
-            return $ticket;
+            return $ticket->load(['customer', 'history.changedBy', 'photos']);
         });
+
+        $this->notifications->notify($ticket, TicketNotificationType::Created);
+
+        return $ticket;
     }
 
     public function changeStatus(
@@ -85,7 +85,7 @@ class TicketService
             ]);
         }
 
-        return DB::transaction(function () use ($ticket, $actor, $to, $note): RepairTicket {
+        $ticket = DB::transaction(function () use ($ticket, $actor, $to, $note): RepairTicket {
             $from = $ticket->status;
 
             $ticket->update([
@@ -99,12 +99,12 @@ class TicketService
                 'changed_by' => $actor->id,
             ]);
 
-            $ticket = $ticket->refresh()->load(['customer', 'history.changedBy']);
-
-            $this->notifications->notify($ticket, TicketNotificationType::StatusChanged);
-
-            return $ticket;
+            return $ticket->refresh()->load(['customer', 'history.changedBy']);
         });
+
+        $this->notifications->notify($ticket, TicketNotificationType::StatusChanged);
+
+        return $ticket;
     }
 
     /**

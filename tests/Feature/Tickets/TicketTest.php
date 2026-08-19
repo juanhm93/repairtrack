@@ -332,7 +332,7 @@ class TicketTest extends TestCase
 
     public function test_user_can_create_a_ticket_with_photos(): void
     {
-        Storage::fake('public');
+        Storage::fake('public', ['url' => '']);
 
         $user = User::factory()->create();
         $front = UploadedFile::fake()->image('front.jpg');
@@ -353,7 +353,7 @@ class TicketTest extends TestCase
             $this->assertNotSame('', $photo->path);
             $this->assertStringContainsString("tickets/{$ticket->user_id}/{$ticket->id}/", $photo->path);
             Storage::disk('public')->assertExists($photo->path);
-            $this->assertStringStartsWith('/storage/', $photo->url);
+            $this->assertStringStartsWith('/tickets/', $photo->url);
             $this->assertStringContainsString($photo->path, $photo->url);
         });
 
@@ -372,7 +372,7 @@ class TicketTest extends TestCase
 
     public function test_ticket_photos_cannot_exceed_five(): void
     {
-        Storage::fake('public');
+        Storage::fake('public', ['url' => '']);
 
         $user = User::factory()->create();
         $photos = [];
@@ -392,7 +392,7 @@ class TicketTest extends TestCase
 
     public function test_ticket_photos_must_be_images(): void
     {
-        Storage::fake('public');
+        Storage::fake('public', ['url' => '']);
 
         $user = User::factory()->create();
 
@@ -626,7 +626,7 @@ class TicketTest extends TestCase
 
     public function test_user_can_delete_a_ticket_and_files_but_customer_remains(): void
     {
-        Storage::fake('public');
+        Storage::fake('public', ['url' => '']);
 
         $user = User::factory()->create();
         $ticket = RepairTicket::factory()->create([

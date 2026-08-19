@@ -40,8 +40,8 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => '/storage',
+            'root' => public_path(),
+            'url' => '',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,

@@ -21,7 +21,7 @@ class TicketNotificationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_creating_a_ticket_queues_a_notification_and_writes_a_log(): void
+    public function test_creating_a_ticket_sends_a_notification_and_writes_a_log(): void
     {
         Notification::fake();
 
@@ -56,7 +56,7 @@ class TicketNotificationTest extends TestCase
         $this->assertSame(1, $ticket->notifications()->count());
     }
 
-    public function test_changing_status_queues_another_notification_and_log(): void
+    public function test_changing_status_sends_another_notification_and_log(): void
     {
         Notification::fake();
 
