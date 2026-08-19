@@ -9,9 +9,10 @@ Reemplaza el placeholder de [`resources/js/pages/Dashboard.vue`](../../resources
 ## Dependencias
 
 - Spec 01: `RepairTicket`, `Customer`, `TicketStatus`, Create/Show
+- Spec 01.1: listado CRUD en `GET /tickets` (ver / editar / borrar). Este dashboard **no** lo reemplaza
 - Ruta actual: `GET /dashboard` es Inertia estático en [`routes/web.php`](../../routes/web.php)
 - Tests existentes: [`tests/Feature/DashboardTest.php`](../../tests/Feature/DashboardTest.php) (guest redirect + acceso autenticado) — deben seguir pasando
-- Sidebar ya tiene el ítem Dashboard (spec 01 agregó “Nuevo ticket”)
+- Sidebar ya tiene el ítem Dashboard (spec 01 agregó “Nuevo ticket”; spec 01.1 agrega “Tickets”)
 
 ## Alcance
 
@@ -28,6 +29,7 @@ Reemplaza el placeholder de [`resources/js/pages/Dashboard.vue`](../../resources
 - Gráficas, KPIs de ingresos o métricas de v2
 - Cola compartida de un local o asignación entre técnicos (PRD §8)
 - Historial dedicado por cliente (PRD §8)
+- Listado CRUD `/tickets`, edición de campos y borrado (spec 01.1)
 - Bulk actions (cambiar estado a varios tickets)
 - Paginación infinita / live updates; paginación offset estándar sí entra
 
@@ -149,5 +151,6 @@ Actualizar/extender `DashboardTest`:
 - Los cinco filtros del PRD funcionan
 - Los atrasados se distinguen a simple vista
 - Desde el listado se abre el show (spec 01) y se crea un ticket nuevo
+- El dashboard no sustituye el index de tickets (spec 01.1)
 - Un usuario no ve trabajos de otro
 - `DashboardTest` original (guest + auth access) sigue verde
