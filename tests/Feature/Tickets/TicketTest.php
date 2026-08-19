@@ -397,6 +397,266 @@ class TicketTest extends TestCase
         $this->assertSame(0, RepairTicket::query()->count());
     }
 
+    public function test_guests_cannot_access_ticket_index_or_edit(): void
+    {
+        $ticket = RepairTicket::factory()->create();
+
+        $this->get(route('tickets.index'))
+            ->assertRedirect(route('login'));
+
+        $this->get(route('tickets.edit', $ticket))
+            ->assertRedirect(route('login'));
+    }
+
+    public function test_authenticated_user_sees_only_their_tickets_on_index(): void
+    {
+        $user = User::factory()->create();
+        $other = User::factory()->create();
+
+        $own = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+            'device_type' => 'celular',
+        ]);
+        RepairTicket::factory()->create([
+            'user_id' => $other->id,
+            'device_type' => 'laptop',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('tickets.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tickets/Index')
+                ->has('tickets.data', 1)
+                ->where('tickets.data.0.id', $own->id)
+                ->where('tickets.data.0.device_type', 'celular')
+                ->has('tickets.data.0.customer')
+                ->missing('tickets.data.0.history')
+                ->missing('tickets.data.0.photos')
+                ->has('filters')
+                ->has('statusOptions'));
+    }
+
+    public function test_index_lists_delivered_tickets_by_default(): void
+    {
+        $user = User::factory()->create();
+
+        RepairTicket::factory()->create(['user_id' => $user->id]);
+        RepairTicket::factory()->delivered()->create(['user_id' => $user->id]);
+
+        $this->actingAs($user)
+            ->get(route('tickets.index'))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tickets/Index')
+                ->has('tickets.data', 2));
+    }
+
+    public function test_index_can_filter_by_status_and_customer_query(): void
+    {
+        $user = User::factory()->create();
+
+        $ana = Customer::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Ana Pérez',
+            'email' => 'ana@example.com',
+            'phone' => '809-555-0100',
+        ]);
+        $luis = Customer::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Luis Gómez',
+            'email' => 'luis@example.com',
+        ]);
+
+        $delivered = RepairTicket::factory()->delivered()->create([
+            'user_id' => $user->id,
+            'customer_id' => $ana->id,
+        ]);
+        RepairTicket::factory()->create([
+            'user_id' => $user->id,
+            'customer_id' => $luis->id,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('tickets.index', ['status' => TicketStatus::Delivered->value]))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tickets/Index')
+                ->has('tickets.data', 1)
+                ->where('tickets.data.0.id', $delivered->id)
+                ->where('filters.status', TicketStatus::Delivered->value));
+
+        $this->actingAs($user)
+            ->get(route('tickets.index', ['q' => 'Ana']))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->has('tickets.data', 1)
+                ->where('tickets.data.0.id', $delivered->id)
+                ->where('filters.q', 'Ana'));
+    }
+
+    public function test_user_can_view_the_edit_page_for_their_ticket(): void
+    {
+        $user = User::factory()->create();
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+            'device_type' => 'celular',
+            'brand' => 'Apple',
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('tickets.edit', $ticket))
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('tickets/Edit')
+                ->where('ticket.id', $ticket->id)
+                ->where('ticket.device_type', 'celular')
+                ->where('ticket.brand', 'Apple')
+                ->has('ticket.customer', fn (Assert $customer) => $customer
+                    ->where('id', $ticket->customer_id)
+                    ->etc())
+                ->has('customers')
+                ->has('deviceCatalog.celular')
+                ->has('deviceHistory'));
+    }
+
+    public function test_user_can_update_a_ticket_and_reuse_the_customer_by_email(): void
+    {
+        $user = User::factory()->create();
+        $customer = Customer::factory()->create([
+            'user_id' => $user->id,
+            'name' => 'Ana Pérez',
+            'email' => 'ana@example.com',
+            'phone' => '809-555-0100',
+        ]);
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+            'customer_id' => $customer->id,
+            'device_type' => 'celular',
+            'status' => TicketStatus::InRepair,
+        ]);
+
+        $this->actingAs($user)
+            ->put(route('tickets.update', $ticket), $this->validPayload([
+                'customer_name' => 'Ana María Pérez',
+                'customer_email' => 'Ana@example.com',
+                'customer_phone' => '809-555-0199',
+                'device_type' => 'laptop',
+                'brand' => 'Dell',
+                'model' => 'XPS 13',
+                'serial_number' => 'SN-UPDATED',
+                'reported_issue' => 'No carga',
+                'estimated_cost' => 200,
+            ]))
+            ->assertRedirect(route('tickets.show', $ticket));
+
+        $ticket->refresh();
+        $customer->refresh();
+
+        $this->assertSame($customer->id, $ticket->customer_id);
+        $this->assertSame('laptop', $ticket->device_type);
+        $this->assertSame('Dell', $ticket->brand);
+        $this->assertSame('XPS 13', $ticket->model);
+        $this->assertSame('SN-UPDATED', $ticket->serial_number);
+        $this->assertSame('No carga', $ticket->reported_issue);
+        $this->assertSame('200.00', $ticket->estimated_cost);
+        $this->assertSame('Ana María Pérez', $customer->name);
+        $this->assertSame('ana@example.com', $customer->email);
+        $this->assertSame('809-555-0199', $customer->phone);
+        $this->assertSame(1, Customer::query()->where('user_id', $user->id)->count());
+    }
+
+    public function test_update_does_not_change_status_or_public_token_or_write_history(): void
+    {
+        $user = User::factory()->create();
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+            'status' => TicketStatus::InRepair,
+        ]);
+        $originalToken = $ticket->public_token;
+
+        $this->actingAs($user)
+            ->put(route('tickets.update', $ticket), [
+                ...$this->validPayload([
+                    'customer_email' => $ticket->customer->email,
+                    'customer_name' => $ticket->customer->name,
+                ]),
+                'status' => TicketStatus::Delivered->value,
+                'public_token' => 'hacked-token-value-32charsxxxxx',
+            ])
+            ->assertRedirect(route('tickets.show', $ticket));
+
+        $ticket->refresh();
+
+        $this->assertSame(TicketStatus::InRepair, $ticket->status);
+        $this->assertSame($originalToken, $ticket->public_token);
+        $this->assertSame(1, $ticket->history()->count());
+    }
+
+    public function test_user_cannot_edit_update_or_delete_another_users_ticket(): void
+    {
+        $owner = User::factory()->create();
+        $other = User::factory()->create();
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $owner->id,
+        ]);
+
+        $this->actingAs($other)
+            ->get(route('tickets.edit', $ticket))
+            ->assertNotFound();
+
+        $this->actingAs($other)
+            ->put(route('tickets.update', $ticket), $this->validPayload())
+            ->assertNotFound();
+
+        $this->actingAs($other)
+            ->delete(route('tickets.destroy', $ticket))
+            ->assertNotFound();
+
+        $this->assertTrue(RepairTicket::query()->whereKey($ticket->id)->exists());
+    }
+
+    public function test_user_can_delete_a_ticket_and_files_but_customer_remains(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+        $ticket = RepairTicket::factory()->create([
+            'user_id' => $user->id,
+        ]);
+        $customerId = $ticket->customer_id;
+        $path = "tickets/{$user->id}/{$ticket->id}/front.jpg";
+
+        Storage::disk('public')->put($path, 'fake-image');
+        $ticket->photos()->create([
+            'path' => $path,
+            'sort_order' => 0,
+        ]);
+
+        $this->assertSame(1, $ticket->history()->count());
+        $this->assertSame(1, $ticket->photos()->count());
+
+        $this->actingAs($user)
+            ->delete(route('tickets.destroy', $ticket))
+            ->assertRedirect(route('tickets.index'));
+
+        $this->assertDatabaseMissing('repair_tickets', ['id' => $ticket->id]);
+        $this->assertDatabaseMissing('ticket_status_history', ['repair_ticket_id' => $ticket->id]);
+        $this->assertDatabaseMissing('ticket_photos', ['repair_ticket_id' => $ticket->id]);
+        $this->assertDatabaseHas('customers', ['id' => $customerId]);
+        Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_guests_cannot_delete_a_ticket(): void
+    {
+        $ticket = RepairTicket::factory()->create();
+
+        $this->delete(route('tickets.destroy', $ticket))
+            ->assertRedirect(route('login'));
+
+        $this->assertTrue(RepairTicket::query()->whereKey($ticket->id)->exists());
+    }
+
     /**
      * @param  array<string, mixed>  $overrides
      * @return array<string, mixed>

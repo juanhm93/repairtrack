@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import { Mic, Square } from '@lucide/vue';
 import { computed, ref } from 'vue';
 import TicketController from '@/actions/App/Http/Controllers/TicketController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import CustomerFields from '@/components/tickets/CustomerFields.vue';
-import DevicePhotosField from '@/components/tickets/DevicePhotosField.vue';
 import SuggestInput from '@/components/tickets/SuggestInput.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,36 +19,48 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useSpeechToText } from '@/composables/useSpeechToText';
-import { create, index } from '@/routes/tickets';
-import type { Customer, DeviceCatalog, DeviceHistoryItem } from '@/types';
+import { edit, index, show } from '@/routes/tickets';
+import type {
+    Customer,
+    DeviceCatalog,
+    DeviceHistoryItem,
+    RepairTicket,
+} from '@/types';
 import { deviceTypeOptions } from '@/types';
 
 const props = defineProps<{
+    ticket: Omit<RepairTicket, 'history' | 'photos'>;
     customers: Customer[];
     deviceCatalog: DeviceCatalog;
     deviceHistory: DeviceHistoryItem[];
 }>();
 
 defineOptions({
-    layout: {
+    layout: (pageProps: { ticket: { id: number } }) => ({
         breadcrumbs: [
             {
                 title: 'Tickets',
                 href: index(),
             },
             {
-                title: 'Nuevo ticket',
-                href: create(),
+                title: `Ticket #${pageProps.ticket.id}`,
+                href: show(pageProps.ticket.id),
+            },
+            {
+                title: 'Editar',
+                href: edit(pageProps.ticket.id),
             },
         ],
-    },
+    }),
 });
 
-const today = new Date().toISOString().slice(0, 10);
-const deviceType = ref<(typeof deviceTypeOptions)[number]['value']>('celular');
-const brand = ref('');
-const model = ref('');
-const reportedIssue = ref('');
+const toDateInput = (value: string | null): string =>
+    value ? value.slice(0, 10) : '';
+
+const deviceType = ref(props.ticket.device_type);
+const brand = ref(props.ticket.brand ?? '');
+const model = ref(props.ticket.model ?? '');
+const reportedIssue = ref(props.ticket.reported_issue);
 
 const { listening, toggle: toggleDictation } = useSpeechToText(
     () => reportedIssue.value,
@@ -126,16 +137,16 @@ const selectClass =
 </script>
 
 <template>
-    <Head title="Nuevo ticket" />
+    <Head :title="`Editar ticket #${ticket.id}`" />
 
     <div class="flex flex-1 flex-col gap-6 p-4">
         <Heading
-            title="Nuevo ticket"
-            description="Registra el cliente y el equipo que recibiste a reparación."
+            :title="`Editar ticket #${ticket.id}`"
+            description="Corrige los datos del cliente y del equipo. El estado se cambia en el detalle."
         />
 
         <Form
-            v-bind="TicketController.store.form()"
+            v-bind="TicketController.update.form(ticket)"
             class="mx-auto w-full max-w-3xl space-y-6"
             v-slot="{ errors, processing }"
         >
@@ -148,7 +159,13 @@ const selectClass =
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <CustomerFields :customers="customers" :errors="errors" />
+                    <CustomerFields
+                        :customers="customers"
+                        :errors="errors"
+                        :initial-email="ticket.customer.email"
+                        :initial-name="ticket.customer.name"
+                        :initial-phone="ticket.customer.phone"
+                    />
                 </CardContent>
             </Card>
 
@@ -208,6 +225,7 @@ const selectClass =
                             name="serial_number"
                             placeholder="Opcional"
                             autocomplete="off"
+                            :default-value="ticket.serial_number ?? ''"
                         />
                         <InputError :message="errors.serial_number" />
                     </div>
@@ -243,9 +261,6 @@ const selectClass =
                         </p>
                         <InputError :message="errors.reported_issue" />
                     </div>
-                    <DevicePhotosField
-                        :error="errors.photos ?? errors['photos.0']"
-                    />
                     <div class="grid gap-2">
                         <Label for="estimated_cost">Costo estimado</Label>
                         <Input
@@ -255,6 +270,7 @@ const selectClass =
                             min="0"
                             step="0.01"
                             placeholder="0.00"
+                            :default-value="ticket.estimated_cost ?? ''"
                         />
                         <InputError :message="errors.estimated_cost" />
                     </div>
@@ -265,7 +281,7 @@ const selectClass =
                             type="date"
                             name="received_at"
                             required
-                            :default-value="today"
+                            :default-value="toDateInput(ticket.received_at)"
                         />
                         <InputError :message="errors.received_at" />
                     </div>
@@ -277,15 +293,21 @@ const selectClass =
                             id="estimated_delivery_at"
                             type="date"
                             name="estimated_delivery_at"
+                            :default-value="
+                                toDateInput(ticket.estimated_delivery_at)
+                            "
                         />
                         <InputError :message="errors.estimated_delivery_at" />
                     </div>
                 </CardContent>
             </Card>
 
-            <div class="flex justify-end">
+            <div class="flex justify-end gap-2">
+                <Button type="button" variant="outline" as-child>
+                    <Link :href="show(ticket.id)">Cancelar</Link>
+                </Button>
                 <Button type="submit" :disabled="processing">
-                    Crear ticket
+                    Guardar cambios
                 </Button>
             </div>
         </Form>
