@@ -22,4 +22,12 @@ class RepairTicketPolicy
     {
         return $repairTicket->user_id === $user->id;
     }
+
+    /**
+     * Determine whether the user can delete the ticket.
+     */
+    public function delete(User $user, RepairTicket $repairTicket): bool
+    {
+        return $repairTicket->user_id === $user->id;
+    }
 }

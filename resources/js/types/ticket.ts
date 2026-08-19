@@ -42,21 +42,49 @@ export type DeviceHistoryItem = {
     model: string | null;
 };
 
-export type RepairTicket = {
+export type TicketListItem = {
     id: number;
-    public_token: string;
     device_type: string;
     brand: string | null;
     model: string | null;
     serial_number: string | null;
-    reported_issue: string;
     estimated_cost: string | null;
     received_at: string;
     estimated_delivery_at: string | null;
     status: TicketStatus;
     customer: Customer;
+};
+
+export type RepairTicket = TicketListItem & {
+    public_token: string;
+    reported_issue: string;
     history: TicketStatusHistoryItem[];
     photos: TicketPhoto[];
+};
+
+export type TicketIndexFilters = {
+    status: TicketStatus | null;
+    q: string | null;
+};
+
+export type Paginated<T> = {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from: number | null;
+    to: number | null;
+    first_page_url: string | null;
+    last_page_url: string | null;
+    next_page_url: string | null;
+    prev_page_url: string | null;
+    path: string;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
 };
 
 export const deviceTypeOptions = [
@@ -67,3 +95,25 @@ export const deviceTypeOptions = [
     { value: 'consola', label: 'Consola' },
     { value: 'otro', label: 'Otro' },
 ] as const;
+
+export const deviceTypeLabel = (deviceType: string): string =>
+    deviceTypeOptions.find((option) => option.value === deviceType)?.label ??
+    deviceType;
+
+export const ticketStatusVariant = (
+    status: TicketStatus,
+): 'default' | 'secondary' | 'destructive' | 'outline' => {
+    if (status === 'not_repairable') {
+        return 'destructive';
+    }
+
+    if (status === 'delivered' || status === 'received') {
+        return 'secondary';
+    }
+
+    if (status === 'waiting_approval' || status === 'in_review') {
+        return 'outline';
+    }
+
+    return 'default';
+};

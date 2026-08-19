@@ -5,6 +5,7 @@ import {
     FolderGit2,
     LayoutGrid,
     Shield,
+    Ticket,
     TicketPlus,
 } from '@lucide/vue';
 import { computed } from 'vue';
@@ -23,7 +24,7 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
 import { index as admin } from '@/routes/admin';
-import { create } from '@/routes/tickets';
+import { create, index as tickets } from '@/routes/tickets';
 import type { NavItem } from '@/types';
 
 const page = usePage();
@@ -34,6 +35,11 @@ const mainNavItems = computed<NavItem[]>(() => {
             title: 'Dashboard',
             href: dashboard(),
             icon: LayoutGrid,
+        },
+        {
+            title: 'Tickets',
+            href: tickets(),
+            icon: Ticket,
         },
         {
             title: 'Nuevo ticket',

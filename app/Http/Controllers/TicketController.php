@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TicketStatus;
+use App\Http\Requests\IndexTicketRequest;
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Http\Requests\UpdateTicketStatusRequest;
 use App\Models\RepairTicket;
 use App\Models\User;
@@ -17,6 +19,23 @@ use Inertia\Response;
 
 class TicketController extends Controller
 {
+    /**
+     * Display a listing of the user's tickets.
+     */
+    public function index(IndexTicketRequest $request, TicketService $tickets): Response
+    {
+        $filters = $request->filters();
+
+        return Inertia::render('tickets/Index', [
+            'tickets' => $tickets->paginateForIndex($this->actor($request), $filters),
+            'filters' => [
+                'status' => $filters['status']?->value,
+                'q' => $filters['q'],
+            ],
+            'statusOptions' => TicketStatus::options(),
+        ]);
+    }
+
     /**
      * Show the form for creating a new ticket.
      */
@@ -47,6 +66,68 @@ class TicketController extends Controller
         ]);
 
         return to_route('tickets.show', $ticket);
+    }
+
+    /**
+     * Show the form for editing the ticket.
+     */
+    public function edit(Request $request, RepairTicket $ticket): Response
+    {
+        Gate::authorize('update', $ticket);
+
+        $ticket->load('customer');
+
+        $customers = $this->actor($request)
+            ->customers()
+            ->orderByDesc('updated_at')
+            ->get(['id', 'name', 'email', 'phone']);
+
+        return Inertia::render('tickets/Edit', [
+            'ticket' => $ticket,
+            'customers' => $customers,
+            'deviceCatalog' => DeviceCatalog::all(),
+            'deviceHistory' => DeviceCatalog::historyFor($this->actor($request)),
+        ]);
+    }
+
+    /**
+     * Update the ticket and customer fields (not status).
+     */
+    public function update(
+        UpdateTicketRequest $request,
+        RepairTicket $ticket,
+        TicketService $tickets,
+    ): RedirectResponse {
+        Gate::authorize('update', $ticket);
+
+        $tickets->update($ticket, $this->actor($request), $request->payload());
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Ticket actualizado.'),
+        ]);
+
+        return to_route('tickets.show', $ticket);
+    }
+
+    /**
+     * Remove the ticket.
+     */
+    public function destroy(
+        Request $request,
+        RepairTicket $ticket,
+        TicketService $tickets,
+    ): RedirectResponse {
+        Gate::authorize('delete', $ticket);
+
+        $tickets->delete($ticket, $this->actor($request));
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => __('Ticket eliminado.'),
+        ]);
+
+        return to_route('tickets.index');
     }
 
     /**

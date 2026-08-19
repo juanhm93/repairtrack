@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { Form, Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 import TicketController from '@/actions/App/Http/Controllers/TicketController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
+import DeleteTicketDialog from '@/components/tickets/DeleteTicketDialog.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,10 +17,9 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDate, formatDateTime } from '@/plugins/date';
-import { dashboard } from '@/routes';
-import { show } from '@/routes/tickets';
+import { edit, index, show } from '@/routes/tickets';
 import type { RepairTicket, TicketStatus, TicketStatusOption } from '@/types';
-import { deviceTypeOptions } from '@/types';
+import { deviceTypeLabel, ticketStatusVariant } from '@/types';
 
 const props = defineProps<{
     ticket: RepairTicket;
@@ -30,8 +30,8 @@ defineOptions({
     layout: (pageProps: { ticket: RepairTicket }) => ({
         breadcrumbs: [
             {
-                title: 'Dashboard',
-                href: dashboard(),
+                title: 'Tickets',
+                href: index(),
             },
             {
                 title: `Ticket #${pageProps.ticket.id}`,
@@ -44,26 +44,19 @@ defineOptions({
 const statusLabel = (status: TicketStatus): string =>
     props.statuses.find((option) => option.value === status)?.label ?? status;
 
-const deviceTypeLabel = computed(() => {
-    const match = deviceTypeOptions.find(
-        (option) => option.value === props.ticket.device_type,
-    );
-
-    return match?.label ?? props.ticket.device_type;
-});
-
 const nextStatuses = computed(() =>
     props.statuses.filter((option) => option.value !== props.ticket.status),
 );
 
 const equipmentTitle = computed(() => {
+    const type = deviceTypeLabel(props.ticket.device_type);
     const parts = [props.ticket.brand, props.ticket.model].filter(Boolean);
 
     if (parts.length === 0) {
-        return deviceTypeLabel.value;
+        return type;
     }
 
-    return `${deviceTypeLabel.value} · ${parts.join(' ')}`;
+    return `${type} · ${parts.join(' ')}`;
 });
 
 const selectClass =
@@ -79,24 +72,6 @@ const formatCost = (value: string | null): string => {
         currency: 'USD',
     }).format(Number(value));
 };
-
-const statusVariant = (
-    status: TicketStatus,
-): 'default' | 'secondary' | 'destructive' | 'outline' => {
-    if (status === 'not_repairable') {
-        return 'destructive';
-    }
-
-    if (status === 'delivered' || status === 'received') {
-        return 'secondary';
-    }
-
-    if (status === 'waiting_approval' || status === 'in_review') {
-        return 'outline';
-    }
-
-    return 'default';
-};
 </script>
 
 <template>
@@ -108,9 +83,15 @@ const statusVariant = (
                 :title="`Ticket #${ticket.id}`"
                 :description="equipmentTitle"
             />
-            <Badge :variant="statusVariant(ticket.status)">
-                {{ statusLabel(ticket.status) }}
-            </Badge>
+            <div class="flex flex-wrap items-center gap-2">
+                <Badge :variant="ticketStatusVariant(ticket.status)">
+                    {{ statusLabel(ticket.status) }}
+                </Badge>
+                <Button variant="outline" size="sm" as-child>
+                    <Link :href="edit(ticket.id)">Editar</Link>
+                </Button>
+                <DeleteTicketDialog :ticket-id="ticket.id" />
+            </div>
         </div>
 
         <div class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">

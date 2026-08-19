@@ -8,14 +8,24 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import type { Customer } from '@/types';
 
-const props = defineProps<{
-    customers: Customer[];
-    errors: Record<string, string>;
-}>();
+const props = withDefaults(
+    defineProps<{
+        customers: Customer[];
+        errors: Record<string, string>;
+        initialEmail?: string;
+        initialName?: string;
+        initialPhone?: string | null;
+    }>(),
+    {
+        initialEmail: '',
+        initialName: '',
+        initialPhone: '',
+    },
+);
 
-const email = ref('');
-const name = ref('');
-const phone = ref('');
+const email = ref(props.initialEmail);
+const name = ref(props.initialName);
+const phone = ref(props.initialPhone ?? '');
 const open = ref(false);
 const highlightedIndex = ref(0);
 const root = useTemplateRef<HTMLElement>('root');
@@ -121,10 +131,10 @@ const onEmailKeydown = (event: KeyboardEvent): void => {
                     type="email"
                     name="customer_email"
                     required
-                    autofocus
                     autocomplete="off"
                     spellcheck="false"
                     placeholder="Busca por correo o nombre"
+                    :autofocus="!initialEmail"
                     role="combobox"
                     aria-autocomplete="list"
                     :aria-expanded="showSuggestions"
