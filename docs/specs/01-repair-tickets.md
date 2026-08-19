@@ -4,7 +4,7 @@
 
 Cerrar el PRD §6.2: el usuario registra un equipo, lo mueve de estado con una nota opcional y ve el historial (timeline) de ese ticket. Los clientes se crean o reutilizan al crear el ticket; no hay módulo de clientes.
 
-Al terminar, create/show/cambio de estado están usables en el frontend. El listado filtrable es el spec 04.
+Al terminar, create/show/cambio de estado están usables en el frontend. Listado, edición de campos y borrado son el spec 01.1. El dashboard filtrable es el spec 04.
 
 Todo es **por persona**: un ticket y un cliente pertenecen al `User` que los creó. No hay `Brand` ni cuenta de taller.
 
@@ -32,6 +32,7 @@ Todo es **por persona**: un ticket y un cliente pertenecen al `User` que los cre
 
 - Envío de correo al crear o cambiar estado (spec 02)
 - Ruta pública `/t/{token}` (spec 03); este spec sí genera y persiste `public_token`
+- Listado, edición de campos y borrado (spec 01.1)
 - Dashboard con filtros y atrasados (spec 04)
 - Tabla `brands`, `brand_id`, settings de marca (spec 05)
 - Vista dedicada de historial por cliente (PRD §8)
@@ -183,7 +184,7 @@ show    → Inertia tickets/Show (ticket + customer + history.changedBy + photos
 updateStatus → TicketService::changeStatus → back + toast
 ```
 
-No hay `index` aquí (spec 04). No hay `destroy` en el MVP.
+No hay `index` / `edit` / `update` / `destroy` aquí (spec 01.1). Cambio de estado sí, en un PATCH aparte (`updateStatus`).
 
 ### Form Requests
 
@@ -267,7 +268,7 @@ En `AppSidebar.vue`, además de Dashboard:
 
 - “Nuevo ticket” → `tickets.create`
 
-El listado vive en el dashboard (spec 04); no agregar un ítem “Tickets” vacío.
+El listado CRUD (ítem “Tickets” en el sidebar) es el spec 01.1. El dashboard filtrable es el spec 04; no agregar aquí un ítem “Tickets” vacío.
 
 ## Factory y seeder
 
@@ -306,5 +307,5 @@ No testear envío de mail ni ruta `/t/{token}`.
 - Marca/modelo se sugieren desde catálogo + historial propio; se puede escribir texto libre
 - Se puede guardar número de serie y hasta 5 fotos del equipo
 - El problema reportado se puede dictar al textarea (sin persistir audio)
-- No se envía correo y no existe aún el listado filtrable ni la página pública
+- No se envía correo y no existe aún el listado CRUD (spec 01.1), el dashboard filtrable ni la página pública
 - Fotos y serie no se exponen en spec 03

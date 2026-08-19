@@ -23,15 +23,16 @@ En un local suelen convivir varios técnicos independientes (consolas, teléfono
 
 Dar a un técnico una herramienta simple para:
 1. Registrar un equipo que le dejan a reparación
-2. Actualizar su estado a medida que avanza el proceso
-3. Notificar automáticamente al cliente por correo en cada cambio de estado (marca personal: siguiente iteración)
-4. Que el cliente pueda ver el status en cualquier momento vía un link público, sin login
-5. Que el técnico tenga un dashboard con todos **sus** trabajos, filtrable
-6. Que el técnico pague $3/mes por PayPal o Binance (comprobante + revisión manual); sin pago marcado en los primeros 5 días del mes, la cuenta se suspende
+2. Listar, ver, editar y eliminar **sus** tickets; el cambio de estado es una acción aparte de la edición de datos
+3. Actualizar su estado a medida que avanza el proceso
+4. Notificar automáticamente al cliente por correo en cada cambio de estado (marca personal: siguiente iteración)
+5. Que el cliente pueda ver el status en cualquier momento vía un link público, sin login
+6. Que el técnico tenga un dashboard con todos **sus** trabajos, filtrable
+7. Que el técnico pague $3/mes por PayPal o Binance (comprobante + revisión manual); sin pago marcado en los primeros 5 días del mes, la cuenta se suspende
 
 ## 4. Usuarios
 
-- **Técnico (usuario):** usa el dashboard para crear, actualizar y consultar *sus* tickets de reparación; paga la suscripción desde Facturación. No ve clientes, precios ni tickets de otro usuario.
+- **Técnico (usuario):** usa el listado de tickets y el dashboard para crear, consultar, editar, cambiar de estado y eliminar *sus* tickets de reparación; paga la suscripción desde Facturación. No ve clientes, precios ni tickets de otro usuario.
 - **Admin de la plataforma:** inicia sesión, revisa comprobantes y marca pagado o rechazado. No es un técnico.
 - **Cliente final:** solo recibe correos y accede a la vista pública de status vía link. No tiene cuenta ni login.
 
@@ -54,8 +55,13 @@ Dar a un técnico una herramienta simple para:
 
 ### 6.2 Gestión de tickets
 - Crear ticket: datos del cliente (nombre, teléfono, correo), tipo/marca/modelo de equipo, problema reportado, costo estimado, fecha de recepción, fecha estimada de entrega
+- Listar todos **sus** tickets (todos los estados, no solo pendientes). Desde el listado: ver, editar o eliminar
+- Ver el detalle de un ticket: cliente, equipo, fotos, estado actual y timeline
+- Editar datos del ticket (cliente, equipo, problema, fechas, costo estimado). No mezcla el cambio de estado: ver es un llamado, editar campos otro, cambiar estado otro
 - Actualizar estado del ticket (con nota opcional, ej. "esperando pantalla")
 - Ver historial completo de estados de un ticket (timeline)
+- Eliminar un ticket (el cliente se conserva; se pierde el historial y las fotos de ese ticket)
+- Detalle implementable: [spec 01](../specs/01-repair-tickets.md) (crear, ver, cambiar estado) y [spec 01.1](../specs/01.1-ticket-list-edit-delete.md) (listar, editar, eliminar)
 
 ### 6.3 Notificaciones por correo
 - Al crear el ticket y en cada cambio de estado, se envía un correo automático al cliente
@@ -69,7 +75,7 @@ Dar a un técnico una herramienta simple para:
 - No expone datos sensibles del técnico ni de otros clientes
 
 ### 6.5 Dashboard
-- Listado de todos **sus** trabajos, con foco en los pendientes (no entregados)
+- Vista operativa de todos **sus** trabajos, con foco en los pendientes (no entregados). No reemplaza el listado CRUD de §6.2
 - Filtros: por estado, por fecha de recepción, por fecha estimada de entrega, por tipo de equipo, búsqueda por cliente
 - Indicador visual de tickets atrasados (fecha estimada de entrega ya pasada y aún no listos)
 
