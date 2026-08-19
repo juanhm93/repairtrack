@@ -1,0 +1,78 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+
+      - name: Prepare .env for build
+        run: cp .env.example .env
+
+      - name: Install PHP Dependencies
+        run: composer install --no-dev --no-ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Generate application key
+        run: php artisan key:generate --force
+
+      - name: Directory Permissions
+        run: chmod -R 775 storage bootstrap/cache
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Build Frontend Assets
+        run: npm run build
+
+      - name: Deploy to Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR || '/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/.github/**/**
+            .env
+            **/.env
+            **/.env.*
+            **/node_modules/**
+            **/node_modules/**/**
+            tests/**
+            tests/**/**
+            docs/**
+            docs/**/**
+            **/storage/logs/**
+            **/storage/app/public/**
+            **/public/hot
+            **/public/storage

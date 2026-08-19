@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { BookOpen, FolderGit2, LayoutGrid, TicketPlus } from '@lucide/vue';
+import { Link, usePage } from '@inertiajs/vue3';
+import { BookOpen, FolderGit2, LayoutGrid, Shield } from '@lucide/vue';
+import { computed } from 'vue';
 import AppLogo from '@/components/AppLogo.vue';
 import NavFooter from '@/components/NavFooter.vue';
 import NavMain from '@/components/NavMain.vue';
@@ -15,21 +16,30 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import { create } from '@/routes/tickets';
 import type { NavItem } from '@/types';
+import { index as admin } from '@/routes/admin';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Nuevo ticket',
-        href: create(),
-        icon: TicketPlus,
-    },
-];
+const page = usePage();
+
+const mainNavItems = computed<NavItem[]>(() => {
+    const items: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+    ];
+
+    if (page.props.auth.user?.is_admin) {
+        items.push({
+            title: 'Administración',
+            href: admin(),
+            icon: Shield,
+        });
+    }
+
+    return items;
+});
 
 const footerNavItems: NavItem[] = [
     {
