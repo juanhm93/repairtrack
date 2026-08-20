@@ -100,6 +100,26 @@ export type TicketIndexFilters = {
     q: string | null;
 };
 
+export type DashboardMonth = {
+    year: number;
+    month: number;
+    label: string;
+};
+
+export type DashboardStatusCount = {
+    value: TicketStatus;
+    label: string;
+    count: number;
+};
+
+export type DashboardStats = {
+    tickets_count: number;
+    customers_count: number;
+    completed_count: number;
+    pending_count: number;
+    by_status: DashboardStatusCount[];
+};
+
 export type Paginated<T> = {
     data: T[];
     current_page: number;
