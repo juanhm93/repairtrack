@@ -243,12 +243,12 @@ class TicketNotificationTest extends TestCase
                 ->where('ticket.latest_notification', null));
     }
 
-    public function test_public_ticket_route_is_registered_and_not_found_until_spec_03(): void
+    public function test_public_ticket_route_is_registered(): void
     {
         $ticket = RepairTicket::factory()->create();
 
         $this->get(route('public.tickets.show', $ticket->public_token))
-            ->assertNotFound();
+            ->assertOk();
     }
 
     public function test_notification_listener_marks_the_log_as_sent(): void

@@ -7,7 +7,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
-Route::get('t/{token}', [PublicTicketController::class, 'show'])->name('public.tickets.show');
+Route::get('t/{token}', [PublicTicketController::class, 'show'])
+    ->where('token', '[A-Za-z0-9]{16,64}')
+    ->name('public.tickets.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');

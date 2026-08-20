@@ -69,6 +69,32 @@ export type RepairTicket = TicketListItem & {
     latest_notification?: TicketNotificationLog | null;
 };
 
+export type PublicTicketHistoryItem = {
+    to_status: TicketStatus;
+    to_status_label: string;
+    note: string | null;
+    created_at: string;
+};
+
+export type PublicTicketPage = {
+    app: {
+        name: string;
+    };
+    ticket: {
+        device_type: string;
+        brand: string | null;
+        model: string | null;
+        status: TicketStatus;
+        status_label: string;
+        received_at: string;
+        estimated_delivery_at: string | null;
+        history: PublicTicketHistoryItem[];
+    };
+    customer: {
+        name: string;
+    };
+};
+
 export type TicketIndexFilters = {
     status: TicketStatus | null;
     q: string | null;
