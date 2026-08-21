@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
+import RepairTrackBrand from '@/components/RepairTrackBrand.vue';
 import {
     Card,
     CardContent,
@@ -23,13 +23,9 @@ defineProps<{
         <div class="flex w-full max-w-md flex-col gap-6">
             <Link
                 :href="home()"
-                class="flex items-center gap-2 self-center font-medium"
+                class="flex items-center gap-2 self-center font-medium no-underline"
             >
-                <div class="flex h-9 w-9 items-center justify-center">
-                    <AppLogoIcon
-                        class="size-9 fill-current text-black dark:text-white"
-                    />
-                </div>
+                <RepairTrackBrand size="lg" />
             </Link>
 
             <div class="flex flex-col gap-6">
